@@ -1,0 +1,455 @@
+body { 
+  height: 100vh;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  box-sizing: border-box;
+  background: #f4e0c4; /* Desert sand beige */
+}
+
+main {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#game_start_container {
+  width: 700px;
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 40px;
+  border: 5px solid #d4a373; /* Sandy brown border */
+  background: #fcf3db;      /* Parchment background */
+  box-shadow: 0 0 25px rgba(212, 163, 115, 0.4);
+}
+
+.neon-title {
+  text-align: center;
+  background: -webkit-linear-gradient(#be4426, #e6c280);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: xx-large;
+  margin-top: 0;
+}
+
+.neon-subtitle {
+  text-align: center;
+  background: -webkit-linear-gradient(#d48348, #5c3a21);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: x-large;
+  margin-bottom: 20px;
+}
+
+.game_start_car {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 40px;
+}
+
+button {
+  background-color: #be4426; /* Terracotta red button */
+  border: 0 solid #E5E7EB;
+  box-sizing: border-box;
+  color: #ffffff;
+  display: flex;
+  font-family: ui-sans-serif, system-ui, -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  justify-content: center;
+  line-height: 1.75rem;
+  padding: .75rem 1.65rem;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  width: 100%;
+  max-width: 300px;
+  cursor: pointer;
+  transform: rotate(-1deg);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  border-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+button:focus {
+  outline: 0;
+}
+
+button:after {
+  content: '';
+  position: absolute;
+  border: 1px solid #5c3a21;
+  bottom: 4px;
+  left: 4px;
+  width: calc(100% - 1px);
+  height: calc(100% - 1px);
+  border-radius: 8px;
+}
+
+button:hover:after {
+  bottom: 2px;
+  left: 2px;
+}
+
+/* active game container */
+#active_game_container {
+  width: 700px;
+  height: 600px;
+  display: none;
+  flex-direction: column;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 0 35px rgba(212, 163, 115, 0.5);
+  border: 5px solid #d4a373;
+}
+
+/* Car Select View */
+#select_car_view { 
+  width: 500px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 40px;
+  border: 5px solid #d4a373;
+  padding: 0 40px;
+  background: #fcf3db;
+  display: none;
+}
+
+.select_car { 
+  width: 100px;
+  height: 100px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.select_car:hover {
+  transform: scale(1.15) rotate(3deg);
+}
+
+/* Game View Style */
+#game_view {
+  width: 100%;
+  flex: 1;
+  background-color: #5e5850; /* Sandy asphalt road */
+  border-left: 12px solid #c27d38; /* Red clay/sand shoulders */
+  border-right: 12px solid #c27d38;
+  position: relative;
+  z-index: 99;
+  overflow: hidden;
+}
+
+.road_line_container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.road_line {
+  width: 15px;
+  height: 50px;
+  background-color: #eebb44; /* Faded yellow road lines */
+}
+
+.line-1 {
+  position: absolute;
+  left: 150px;
+  top: 0;
+}
+
+.line-2 {
+  position: absolute;
+  right: 150px;
+  top: 0;
+}
+
+#player_car {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 100px;
+  z-index: 100;
+  transition: left 0.15s ease, bottom 0.3s ease-out, transform 0.15s ease;
+}
+
+/* HUD Overlay */
+.game_hud {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+  color: #5c3a21;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 16px;
+  z-index: 101;
+  background: rgba(252, 243, 219, 0.95);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 2px solid #d4a373;
+  font-weight: bold;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+.game_hud div {
+  margin-bottom: 4px;
+}
+
+#pause_btn {
+  margin-top: 5px;
+  background-color: #c2593f;
+  color: white;
+  border: 1px solid #5c3a21;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  width: auto;
+  max-width: 100px;
+  transform: none;
+}
+
+#pause_btn:after {
+  display: none;
+}
+
+#pause_btn:hover {
+  background-color: #d48348;
+}
+
+/* Paused Overlay Screen */
+#paused_overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(94, 88, 80, 0.85); /* Faded road overlay */
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  color: #5c3a21;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+#paused_overlay h2 {
+  font-size: 32px;
+  margin-bottom: 20px;
+  text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.5);
+}
+
+#paused_overlay button {
+  width: 150px;
+  padding: 8px 12px;
+  font-size: 18px;
+  background-color: #d48348;
+  border: 2px solid #5c3a21;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transform: none;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+#paused_overlay button:after {
+  display: none;
+}
+
+#paused_overlay button:hover {
+  background-color: #c2593f;
+}
+
+/* Question Header Style */
+#math_questions_view {
+  width: 100%;
+  height: 120px;
+  background-color: #fcf3db;
+  border-bottom: 4px solid #c2593f;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  z-index: 999;
+  font-family: 'Courier New', Courier, monospace;
+  transition: background-color 0.2s ease;
+}
+
+.question_container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 25px 0 25px;
+  color: #5c3a21;
+  font-size: 26px;
+  font-weight: bold;
+}
+
+.question_container p {
+  margin: 0;
+}
+
+.timer {
+  color: #c2593f;
+}
+
+.answers_question_container {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 20px 8px 20px;
+}
+
+.answer {
+  background-color: #d48348;
+  border: 2px solid #5c3a21;
+  color: #fff;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 6px 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  width: auto;
+  max-width: 100px;
+  transform: none;
+}
+
+.answer:after {
+  display: none;
+}
+
+.answer:hover {
+  background-color: #c2593f;
+  transform: scale(1.08);
+}
+
+.answer:active {
+  transform: scale(0.95);
+}
+
+/* Game Over Screen */
+#game_over_view {
+  width: 700px;
+  height: 500px;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fcf3db;
+  border-radius: 40px;
+  border: 5px solid #d4a373;
+  text-align: center;
+  box-shadow: 0 0 35px rgba(212, 163, 115, 0.4);
+  color: #5c3a21;
+}
+
+#game_over_view button {
+  margin-top: 20px;
+}
+
+#finish_line {
+  position: absolute;
+  top: -50px;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background-color: #ffffff;
+  background-image: 
+    linear-gradient(45deg, #000000 25%, transparent 25%),
+    linear-gradient(135deg, #000000 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #000000 75%),
+    linear-gradient(135deg, transparent 75%, #000000 75%);
+  background-size: 40px 40px;
+  background-position: 0 0, 0 0, 20px 20px, 20px 20px;
+  border-top: 4px solid #000000;
+  border-bottom: 4px solid #000000;
+  z-index: 10;
+  display: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  color: #ffffff;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  font-size: 20px;
+  line-height: 40px;
+  text-shadow: 1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000;
+  letter-spacing: 4px;
+}
+
+/* Flash Animations */
+@keyframes correctFlash {
+  0% { background-color: rgba(76, 175, 80, 0.4); } /* Green sandy flash */
+  100% { background-color: #fcf3db; }
+}
+
+@keyframes wrongFlash {
+  0% { background-color: rgba(244, 67, 54, 0.4); } /* Red sandy flash */
+  100% { background-color: #fcf3db; }
+}
+
+.correct-flash-active {
+  animation: correctFlash 0.5s ease-out;
+}
+
+.wrong-flash-active {
+  animation: wrongFlash 0.5s ease-out;
+}
+
+/* Mobile responsive styles for full-screen height and proportional layout */
+@media (max-width: 768px) {
+  #game_start_container,
+  #active_game_container,
+  #select_car_view,
+  #game_over_view {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-width: 100%;
+    max-height: 100%;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /* Make sure road layout is proportional on smaller screens */
+  #game_view {
+    border-left: 6px solid #c27d38;
+    border-right: 6px solid #c27d38;
+  }
+
+  .line-1 {
+    left: 33.3%;
+  }
+
+  .line-2 {
+    right: 33.3%;
+  }
+
+  /* Adjust select car container padding and image sizes to prevent overflow */
+  #select_car_view {
+    padding: 0 15px;
+    justify-content: space-around;
+  }
+
+  .select_car {
+    width: 75px;
+    height: 75px;
+  }
+}
+

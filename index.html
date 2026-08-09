@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Race</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <main>
+    <section id="game_start_container">
+       <h1 class="neon-title">
+          Math Race
+       </h1>
+              <p class="neon-subtitle">Hello, Welcome to Math Race</p>
+       <img class="game_start_car" src="racing-car.png" alt="">
+       
+        <button onclick="start_game()">
+            🚗start game🚗
+        </button>
+    </section>
+
+    <section id="select_car_view">
+        <img class="select_car select_car_1" src="cars/car1.png" alt="car1" onclick="select_car('cars/car1.png')">
+        <img class="select_car select_car_2" src="cars/car2.png" alt="car2" onclick="select_car('cars/car2.png')">
+        <img class="select_car select_car_3" src="cars/car3.png" alt="car3" onclick="select_car('cars/car3.png')">
+        <img class="select_car select_car_4" src="cars/car4.png" alt="car4" onclick="select_car('cars/car4.png')">
+    </section>
+    <div id="active_game_container" style="display: none;">
+        <section id="math_questions_view">
+            <div class="question_container">
+                <p id="question_text">5 + 7</p>
+                <span class="timer" id="game_timer">10s</span>
+            </div>
+            <div class="answers_question_container">
+                <button class="answer" onclick="check_answer(this.innerText)">12</button>
+                <button class="answer" onclick="check_answer(this.innerText)">13</button>
+                <button class="answer" onclick="check_answer(this.innerText)">14</button>
+            </div>
+        </section>
+
+        <section id="game_view">
+            <div class="game_hud">
+                <div>Distance: <span id="distance_hud">0</span>m</div>
+                <div>Speed: <span id="speed_hud">0</span> km/h</div>
+                <button id="pause_btn" onclick="toggle_pause()">⏸️ Pause</button>
+            </div>
+            <img id="player_car" src="" alt="Player Car">
+            <div class="road_line_container">
+                <div class="road_line line-1"></div>             
+                <div class="road_line line-2"></div>     
+            </div>
+            <div id="paused_overlay" style="display: none;">
+                <h2>Game Paused</h2>
+                <button onclick="toggle_pause()">▶️ Resume</button>
+            </div>
+
+            <div id="finish_line">Finish Line</div>
+
+        </section>
+    </div>
+
+    <section id="game_over_view" style="display: none;">
+        <h1 class="neon-title">Race Finished!</h1>
+        <!-- <p class="neon-subtitle">You drove: <span id="final_distance">0</span>m</p> -->
+        <button onclick="restart_game()">🚗 Race Again 🚗</button>
+    </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
