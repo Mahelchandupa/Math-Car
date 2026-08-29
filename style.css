@@ -4,7 +4,8 @@ body {
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
-  background: #f4e0c4; /* Desert sand beige */
+  background: #29eb39; /* Desert sand beige */
+
 }
 
 main {
@@ -16,7 +17,8 @@ main {
 }
 
 #game_start_container {
-  width: 700px;
+  /* width: 700px; */
+  flex: 1;
   height: 500px;
   display: flex;
   flex-direction: column;
@@ -24,13 +26,13 @@ main {
   justify-content: center;
   border-radius: 40px;
   border: 5px solid #d4a373; /* Sandy brown border */
-  background: #fcf3db;      /* Parchment background */
+  background: #060503;      /* Parchment background */
   box-shadow: 0 0 25px rgba(212, 163, 115, 0.4);
 }
 
 .neon-title {
   text-align: center;
-  background: -webkit-linear-gradient(#be4426, #e6c280);
+  background: -webkit-linear-gradient(#03f43f, #dbfc05);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: xx-large;
@@ -39,24 +41,24 @@ main {
 
 .neon-subtitle {
   text-align: center;
-  background: -webkit-linear-gradient(#d48348, #5c3a21);
-  -webkit-background-clip: text;
+  background: -webkit-linear-gradient(#03e4f4, #054ffc);
+  -webkit-background-clip: text; 
   -webkit-text-fill-color: transparent;
   font-size: x-large;
   margin-bottom: 20px;
 }
 
 .game_start_car {
-  width: 100px;
-  height: 100px;
+  width: 250px;
+  height: 200px;
   margin-bottom: 40px;
 }
 
-button {
-  background-color: #be4426; /* Terracotta red button */
-  border: 0 solid #E5E7EB;
+/* button {
+  background-color: yellow;
+  border: 0 solid #eae9e9;
   box-sizing: border-box;
-  color: #ffffff;
+  color: #151414;
   display: flex;
   font-family: ui-sans-serif, system-ui, -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 1rem;
@@ -96,6 +98,75 @@ button:after {
 button:hover:after {
   bottom: 2px;
   left: 2px;
+} */
+
+.btn-142 {
+    --BG_color: #393333;
+    --color: #000000;
+    width: 140px;
+    height: 40px;
+    border: none;
+    color: var(--color);
+    position: relative;
+    font-weight: bold;
+    font-size: 16px;
+    transition-duration: .2s;
+    background: none;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    user-select: none;
+    padding: 0;
+    z-index: 1;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-142 span {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 11;
+    background: var(--BG_color);
+    border-radius: 7px;
+}
+
+.btn-142:before,
+.btn-142:after {
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: -2px;
+    border-radius: 10px;
+    background: linear-gradient(45deg, #fb0094, #0000ff, #00ff00, #ffff00, #ff0000, #fb0094,
+            #0000ff, #00ff00, #ffff00, #ff0000);
+    background-size: 400%;
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    z-index: -1;
+    animation: move_142 20s linear infinite;
+}
+
+@keyframes move_142 {
+    0% {
+        background-position: 0 0;
+    }
+
+    50% {
+        background-position: 400% 0;
+    }
+
+    100% {
+        background-position: 0 0;
+    }
+}
+
+.btn-142:after {
+    filter: blur(50px);
 }
 
 /* active game container */
@@ -112,7 +183,7 @@ button:hover:after {
 
 /* Car Select View */
 #select_car_view { 
-  width: 500px;
+  width: 700px;
   height: 400px;
   display: flex;
   align-items: center;
@@ -176,14 +247,27 @@ button:hover:after {
 
 #player_car {
   position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
+  bottom: 120px;
+  left: 60%;
+  /* transform: translateX(-50%); */
+  width: 90px;
   height: 100px;
   z-index: 100;
   transition: left 0.15s ease, bottom 0.3s ease-out, transform 0.15s ease;
 }
+
+#defeating_car {
+  position: absolute;
+  bottom: 20px;
+  left: 40%;
+  transform: translateX(-60%);
+  width: 80px;
+  height: 80px;
+  z-index: 100;
+  transition: left 0.15s ease, bottom 0.3s ease-out, transform 0.15s ease;
+}
+  
+
 
 /* HUD Overlay */
 .game_hud {
@@ -345,22 +429,41 @@ button:hover:after {
 
 /* Game Over Screen */
 #game_over_view {
-  width: 700px;
+  flex: 1;
   height: 500px;
   display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #fcf3db;
   border-radius: 40px;
   border: 5px solid #d4a373;
   text-align: center;
   box-shadow: 0 0 35px rgba(212, 163, 115, 0.4);
   color: #5c3a21;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('gtr.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
+
 
 #game_over_view button {
   margin-top: 20px;
+  background-color: #060503;
+  width: 200px;
+  height: 50px;
+  color: blue;
+  font-size: 20px;
+  border-radius: 20px;
+  box-shadow: 0 0 35px rgba(212, 163, 115, 0.4);
+ 
+}
+
+.race-finish{
+  color: gold;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 40px;
+  
 }
 
 #finish_line {
@@ -453,3 +556,8 @@ button:hover:after {
   }
 }
 
+.left_img, .right_img{
+  width: 30%;
+  height: 100vh;
+  object-fit: cover;
+}

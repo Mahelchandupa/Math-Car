@@ -12,12 +12,15 @@ const distance_hud = document.getElementById("distance_hud");
 const speed_hud = document.getElementById("speed_hud");
 const player_car = document.getElementById("player_car");
 const final_distance = document.getElementById("final_distance");
+const defeating_car = document.getElementById("defeating_car")
 
 const road_line_container = document.querySelector(".road_line_container");
 
 // --- Game State Variables ---
-let speed = 40;            // Starting speed in km/h
+let speed = 30;            // Starting speed in km/h (updated to 30)
 let distance = 0;          // Starting distance in meters
+let defeat_speed = 50;     // Defeating car speed in km/h
+let defeat_distance = 0;   // Defeating car distance in meters
 let question_time_left = 10; // Timer starting at 10 seconds for each question
 let correct_answer = 0;    // Store the answer of the current question
 let game_active = false;   // Flag to check if game is running
@@ -65,12 +68,15 @@ function select_car(carSrc) {
 function init_game() {
   game_active = true;
   game_paused = false;
-  speed = 5;
+  speed = 30;
   distance = 0;
+  defeat_speed = 40;
+  defeat_distance = 0;
   question_time_left = 10;
   lane = 1;
-  player_car.style.left = "50%"; // Center the car initially
+  player_car.style.left = "60%"; // Center the car initially
   game_timer.innerText = question_time_left + "s";
+  defeating_car.style.left = "40%";
   
   // Hide and reset finish line
   const finish_line = document.getElementById("finish_line");
@@ -122,12 +128,18 @@ function game_loop() {
   
   // 3. Increase distance driven
   distance += speed * 0.015;
+  defeat_distance += defeat_speed * 0.015;
   
-  // 4. Update the HUD displays
+  // 4. Update defeating car position relative to the player
+  let distance_diff = defeat_distance - distance;
+  let defeatTargetBottom = targetBottom + (distance_diff * 4); // 1 meter = 4 pixels
+  defeating_car.style.bottom = defeatTargetBottom + "px";
+  
+  // 5. Update the HUD displays
   distance_hud.innerText = Math.floor(distance);
   speed_hud.innerText = Math.floor(speed);
 
-  // 5. Update Finish Line position and check for game completion
+  // 6. Update Finish Line position and check for game completion
   const finish_line = document.getElementById("finish_line");
   if (finish_line) {
     const final_stretch = 100; // meters before finish line to start showing it
@@ -147,9 +159,11 @@ function game_loop() {
     }
   }
 
-  // 6. Check if player has crossed the finish line
-  if (distance >= finish_distance) {
-    end_game();
+  // 7. Check if player or opponent has crossed the finish line
+  if (defeat_distance >= finish_distance) {
+    end_game(false); // Player loses
+  } else if (distance >= finish_distance) {
+    end_game(true); // Player wins
   }
 }
 
@@ -230,12 +244,14 @@ function check_answer(userAnswerText) {
   void math_questions_view.offsetWidth;
   
   if (answer === correct_answer) {
-    // Correct! Accelerate the car (max speed 120)
+    // Correct! Accelerate the cars
     speed = Math.min(speed + 15, 120);
+    defeat_speed = Math.min(defeat_speed + 5, 100);
     math_questions_view.classList.add("correct-flash-active");
   } else {
-    // Wrong! Decelerate the car (min speed 10)
-    speed = Math.max(speed - 15, 10);
+    // Wrong! Decelerate the cars
+    speed = Math.max(speed - 10, 10);
+    defeat_speed = Math.max(defeat_speed - 3, 30);
     math_questions_view.classList.add("wrong-flash-active");
   }
   
@@ -274,7 +290,7 @@ function toggle_pause() {
 }
 
 // Stops game loops and displays the results screen
-function end_game() {
+function end_game(playerWon) {
   game_active = false;
   game_paused = false;
   clearInterval(game_loop_interval);
@@ -284,6 +300,17 @@ function end_game() {
   game_over_view.style.display = "flex";
   
   final_distance.innerText = Math.floor(distance);
+
+  const raceFinishHeader = document.querySelector(".race-finish");
+  if (raceFinishHeader) {
+    if (playerWon) {
+      raceFinishHeader.innerText = "🏆 Victory! You Won! 🏆";
+      raceFinishHeader.style.color = "gold";
+    } else {
+      raceFinishHeader.innerText = "💥 Defeat! Opponent Won! 💥";
+      raceFinishHeader.style.color = "red";
+    }
+  }
 }
 
 // Returns the player to the car selection screen to race again
@@ -296,32 +323,14 @@ function restart_game() {
   document.getElementById("paused_overlay").style.display = "none";
 }
 
-// --- Input Controls ---
-// Keydown Listener handles Steering (Left/Right) and manual driving controls (Up/Down)
-// document.addEventListener("keydown", (e) => {
-//   if (!game_active || game_paused) return;
+function back_to_home() {
+  game_active = false;
+  game_paused = false;
+  clearInterval(game_loop_interval);
+  clearInterval(timer_interval);
   
-//   // Prevent browser scrolling behavior with Arrow Keys
-//   if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
-//     e.preventDefault();
-//   }
-  
-//   if (e.key === "ArrowLeft") {
-//     lane = Math.max(lane - 1, 0); // Steer left lane
-//   } else if (e.key === "ArrowRight") {
-//     lane = Math.min(lane + 1, 2); // Steer right lane
-//   } else if (e.key === "ArrowUp") {
-//     speed = Math.min(speed + 1, 120); // Manual accelerate forward
-//   } else if (e.key === "ArrowDown") {
-//     speed = Math.max(speed - 5, 10); // Manual decelerate/brake
-//   }
-  
-//   // Move player car to corresponding lane horizontal percentage
-//   if (lane === 0) {
-//     player_car.style.left = "20%";
-//   } else if (lane === 1) {
-//     player_car.style.left = "50%";
-//   } else if (lane === 2) {
-//     player_car.style.left = "80%";
-//   }
-// });
+  active_game_container.style.display = "none";
+  game_over_view.style.display = "none";
+  select_car_view.style.display = "none";
+  game_start_container.style.display = "flex";
+}
