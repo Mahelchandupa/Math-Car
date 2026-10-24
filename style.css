@@ -1,10 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600;700&family=Outfit:wght@400;600;700;800;900&family=Rajdhani:wght@600;700;800&display=swap');
+
+:root {
+  --text-muted: #8b949e;
+}
+
 body { 
   height: 100vh;
   width: 100%;
   margin: 0 auto;
   padding: 0;
   box-sizing: border-box;
-  background: #29eb39; /* Desert sand beige */
+  background: #29eb39;
 
 }
 
@@ -17,7 +23,6 @@ main {
 }
 
 #game_start_container {
-  /* width: 700px; */
   flex: 1;
   height: 500px;
   display: flex;
@@ -25,8 +30,8 @@ main {
   align-items: center;
   justify-content: center;
   border-radius: 40px;
-  border: 5px solid #d4a373; /* Sandy brown border */
-  background: #060503;      /* Parchment background */
+  border: 5px solid #d4a373;
+  background: #060503;
   box-shadow: 0 0 25px rgba(212, 163, 115, 0.4);
 }
 
@@ -53,52 +58,6 @@ main {
   height: 200px;
   margin-bottom: 40px;
 }
-
-/* button {
-  background-color: yellow;
-  border: 0 solid #eae9e9;
-  box-sizing: border-box;
-  color: #151414;
-  display: flex;
-  font-family: ui-sans-serif, system-ui, -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
-  justify-content: center;
-  line-height: 1.75rem;
-  padding: .75rem 1.65rem;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  width: 100%;
-  max-width: 300px;
-  cursor: pointer;
-  transform: rotate(-1deg);
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  border-radius: 8px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-button:focus {
-  outline: 0;
-}
-
-button:after {
-  content: '';
-  position: absolute;
-  border: 1px solid #5c3a21;
-  bottom: 4px;
-  left: 4px;
-  width: calc(100% - 1px);
-  height: calc(100% - 1px);
-  border-radius: 8px;
-}
-
-button:hover:after {
-  bottom: 2px;
-  left: 2px;
-} */
 
 .btn-142 {
     --BG_color: #393333;
@@ -183,27 +142,167 @@ button:hover:after {
 
 /* Car Select View */
 #select_car_view { 
-  width: 700px;
-  height: 400px;
-  display: flex;
+  width: 740px;
+  min-height: 440px;
+  display: none;
   align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   border-radius: 40px;
   border: 5px solid #d4a373;
-  padding: 0 40px;
-  background: #fcf3db;
-  display: none;
+  padding: 20px 30px;
+  background: #0d1117;
+  gap: 15px;
+  box-shadow: 0 0 35px rgba(212, 163, 115, 0.4);
+}
+
+.select_car_view_header {
+  text-align: center;
+}
+
+.your_coin_txt {
+  color: #00ff00;
+  font-size: 22px;
+  margin: 5px 0 0 0;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.car_shop {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 18px;
+  width: 100%;
+}
+
+.car_card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(22, 27, 34, 0.9);
+  border: 2px solid #30363d;
+  border-radius: 16px;
+  padding: 12px;
+  width: 145px;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.car_card:hover {
+  transform: translateY(-4px);
+  border-color: #58a6ff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.car_card.selected {
+  border-color: #d4a373;
+  box-shadow: 0 0 20px rgba(212, 163, 115, 0.6);
+  background: rgba(35, 25, 15, 0.85);
+}
+
+.car_card.locked {
+  opacity: 0.85;
+  background: rgba(15, 17, 21, 0.8);
+}
+
+.car_card.locked .select_car {
+  filter: grayscale(85%) brightness(0.65);
+}
+
+.car_img_wrapper {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .select_car { 
-  width: 100px;
-  height: 100px;
+  max-width: 100px;
+  max-height: 100px;
+  object-fit: contain;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
 
-.select_car:hover {
-  transform: scale(1.15) rotate(3deg);
+.car_card:not(.locked) .select_car:hover {
+  transform: scale(1.1);
+}
+
+.lock_overlay_badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid #d4a373;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.car_title_name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #c9d1d9;
+  margin-top: 6px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.car_price_tag {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffd700;
+  margin: 4px 0 8px 0;
+}
+
+.car_action_btn {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.car_action_btn.btn_select {
+  background: #238636;
+  color: #ffffff;
+}
+
+.car_action_btn.btn_select:hover {
+  background: #2ea043;
+}
+
+.car_action_btn.btn_selected {
+  background: #d4a373;
+  color: #060503;
+  cursor: default;
+}
+
+.car_action_btn.btn_buy {
+  background: linear-gradient(135deg, #d4a373, #e5a93b);
+  color: #060503;
+}
+
+.car_action_btn.btn_buy:hover {
+  filter: brightness(1.15);
+  transform: scale(1.03);
+}
+
+.car_action_btn.btn_buy:disabled {
+  background: #30363d;
+  color: #8b949e;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Game View Style */
@@ -250,8 +349,8 @@ button:hover:after {
   bottom: 120px;
   left: 60%;
   /* transform: translateX(-50%); */
-  width: 90px;
-  height: 100px;
+  width: 100px;
+  height: 110px;
   z-index: 100;
   transition: left 0.15s ease, bottom 0.3s ease-out, transform 0.15s ease;
 }
@@ -262,12 +361,38 @@ button:hover:after {
   left: 40%;
   transform: translateX(-60%);
   width: 80px;
-  height: 80px;
+  height: 110px;
   z-index: 100;
   transition: left 0.15s ease, bottom 0.3s ease-out, transform 0.15s ease;
 }
   
+#obstacle_container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+}
 
+.obstacle {
+  position: absolute;
+  object-fit: contain;
+}
+
+@keyframes car-hit-shake {
+  0% { transform: scale(1); filter: brightness(1); }
+  20% { transform: scale(0.92) rotate(-4deg); filter: brightness(1.8) drop-shadow(0 0 14px #ff3333); }
+  40% { transform: scale(0.92) rotate(4deg); filter: brightness(1.8) drop-shadow(0 0 14px #ff3333); }
+  60% { transform: scale(0.96) rotate(-2deg); filter: brightness(1.4) drop-shadow(0 0 8px #ff3333); }
+  80% { transform: scale(0.98) rotate(2deg); filter: brightness(1.2) drop-shadow(0 0 4px #ff3333); }
+  100% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+}
+
+.car-hit {
+  animation: car-hit-shake 0.45s ease-out;
+}
 
 /* HUD Overlay */
 .game_hud {
@@ -405,13 +530,17 @@ button:hover:after {
   font-family: 'Courier New', Courier, monospace;
   font-size: 18px;
   font-weight: bold;
-  padding: 6px 20px;
+  padding: 6px 14px;
   cursor: pointer;
   border-radius: 8px;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition: background-color 0.15s ease, transform 0.1s ease;
   width: auto;
-  max-width: 100px;
-  transform: none;
+  min-width: 85px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  user-select: none;
 }
 
 .answer:after {
@@ -423,8 +552,21 @@ button:hover:after {
   transform: scale(1.08);
 }
 
-.answer:active {
+.answer:active,
+.answer.btn-pressed {
+  background-color: #c2593f;
   transform: scale(0.95);
+}
+
+.key-hint {
+  font-size: 11px;
+  font-weight: bold;
+  color: #5c3a21;
+  background: #fcf3db;
+  border: 1px solid #5c3a21;
+  border-radius: 4px;
+  padding: 1px 5px;
+  line-height: 1;
 }
 
 /* Game Over Screen */
@@ -440,7 +582,7 @@ button:hover:after {
   text-align: center;
   box-shadow: 0 0 35px rgba(212, 163, 115, 0.4);
   color: #5c3a21;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('gtr.jpg');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('assets/game_over_bg_gtr.jpg');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -519,6 +661,7 @@ button:hover:after {
   #game_start_container,
   #active_game_container,
   #select_car_view,
+  #screen_difficulty,
   #game_over_view {
     width: 100vw;
     height: 100vh;
@@ -551,8 +694,24 @@ button:hover:after {
   }
 
   .select_car {
-    width: 75px;
-    height: 75px;
+    width: 85px;
+    height: 85px;
+  }
+
+  /* Mobile responsiveness for difficulty screen */
+  #screen_difficulty {
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  .difficulty_glass_panel {
+    padding: 16px 12px;
+  }
+
+  .difficulty-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 }
 
@@ -560,4 +719,384 @@ button:hover:after {
   width: 30%;
   height: 100vh;
   object-fit: cover;
+}
+
+
+/* ============================================================================
+  4. DIFFICULTY SELECTION SCREEN
+   ============================================================================ */
+#screen_difficulty {
+  width: 700px;
+  max-width: 95vw;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+#screen_difficulty.active {
+  display: flex;
+}
+
+.difficulty_glass_panel {
+  width: 100%;
+  background: #0d1117;
+  border: 4px solid #d4a373;
+  border-radius: 24px;
+  padding: 24px;
+  box-sizing: border-box;
+  box-shadow: 0 0 25px rgba(212, 163, 115, 0.3);
+}
+
+.difficulty_glass_panel .neon-title.size-md {
+  font-size: 24px;
+  margin: 0 0 18px 0;
+  text-align: center;
+  color: #fff;
+  background: none;
+  -webkit-text-fill-color: initial;
+}
+
+.difficulty-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.difficulty-card {
+  background: #161b22;
+  border: 2px solid #30363d;
+  border-radius: 14px;
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  user-select: none;
+}
+
+.difficulty-card:hover {
+  border-color: #d4a373;
+}
+
+.difficulty-card.selected {
+  border-color: #d4a373;
+  background: #21262d;
+}
+
+.diff-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.diff-badge.beg { background: #10b981; color: #fff; }
+.diff-badge.int { background: #0284c7; color: #fff; }
+.diff-badge.adv { background: #e11d48; color: #fff; }
+
+.diff-age {
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.difficulty-card p {
+  color: #8b949e !important;
+  font-size: 13px;
+  margin: 0 0 12px 0;
+  min-height: 36px;
+  line-height: 1.35;
+}
+
+.diff-examples {
+  background: #090d13;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.diff-examples span {
+  font-size: 12px;
+  color: #c9d1d9;
+  font-family: monospace;
+}
+
+.difficulty-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.neon-btn {
+  font-size: 15px;
+  font-weight: bold;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.neon-btn.pink {
+  background: #c2593f;
+  color: #fff;
+}
+
+.neon-btn.pink:hover {
+  background: #d48348;
+}
+
+.neon-btn.gold {
+  background: #d4a373;
+  color: #060503;
+}
+
+.neon-btn.gold:hover {
+  background: #e2b78b;
+}
+
+/* Instructions & Guide Button on Home Screen */
+.neon-btn-instructions {
+  background: rgba(22, 27, 34, 0.9);
+  color: #d4a373;
+  border: 2px solid #d4a373;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.neon-btn-instructions:hover {
+  background: #d4a373;
+  color: #060503;
+  box-shadow: 0 0 15px rgba(212, 163, 115, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Instructions & Stats Modal Layout */
+#instructions_view, #stats_view {
+  width: 740px;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.instructions_card {
+  width: 100%;
+  background: #0d1117;
+  border: 4px solid #d4a373;
+  border-radius: 28px;
+  padding: 24px 30px;
+  box-shadow: 0 0 35px rgba(212, 163, 115, 0.45);
+  box-sizing: border-box;
+}
+
+.instructions_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #30363d;
+  padding-bottom: 10px;
+}
+
+.instructions_header .neon-title {
+  margin: 0;
+  font-size: 24px;
+}
+
+.close_btn {
+  background: #21262d;
+  color: #c9d1d9;
+  border: 1px solid #484f58;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+
+.close_btn:hover {
+  background: #c2593f;
+  color: white;
+  border-color: #c2593f;
+}
+
+.instructions_content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.instructions_content::-webkit-scrollbar {
+  width: 6px;
+}
+.instructions_content::-webkit-scrollbar-thumb {
+  background: #d4a373;
+  border-radius: 3px;
+}
+
+.info_block {
+  background: rgba(22, 27, 34, 0.7);
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 12px 18px;
+}
+
+.info_block h3 {
+  margin: 0 0 8px 0;
+  color: #58a6ff;
+  font-size: 17px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.info_block p {
+  margin: 0 0 6px 0;
+  color: #c9d1d9;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* Coins Table */
+.coins_table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 13px;
+  text-align: left;
+}
+
+.coins_table th {
+  background: #161b22;
+  color: #d4a373;
+  padding: 8px;
+  border-bottom: 2px solid #30363d;
+}
+
+.coins_table td {
+  padding: 8px;
+  color: #c9d1d9;
+  border-bottom: 1px solid #21262d;
+}
+
+.streak_tip {
+  color: #ffd700 !important;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* Stats Modal Grid */
+.stats_grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.stat_box {
+  background: rgba(22, 27, 34, 0.95);
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat_label {
+  font-size: 12px;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat_val {
+  font-size: 20px;
+  font-weight: 800;
+  color: #f0f6fc;
+  font-family: 'Outfit', sans-serif;
+}
+
+.stat_val.gold_text { color: #ffd700; }
+.stat_val.green_text { color: #3fb950; }
+
+/* Game Over Coin Summary */
+.game_over_coin_summary {
+  background: rgba(13, 17, 23, 0.9);
+  border: 2px solid #30363d;
+  border-radius: 16px;
+  padding: 14px 20px;
+  margin: 12px 0;
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result_row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #8b949e;
+}
+
+.result_row.total_row {
+  border-top: 1px solid #30363d;
+  padding-top: 8px;
+  font-weight: bold;
+  color: #f0f6fc;
+}
+
+.gold_text {
+  color: #ffd700;
+  font-weight: bold;
+}
+
+.green_text {
+  color: #3fb950;
+  font-weight: bold;
+}
+
+/* Coin pop animation on correct answer */
+@keyframes coinPopAnim {
+  0% { transform: translateY(0) scale(0.8); opacity: 0; }
+  40% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+  100% { transform: translateY(-40px) scale(1); opacity: 0; }
+}
+
+.coin-floating-feedback {
+  position: absolute;
+  top: 10px;
+  right: 25px;
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+  pointer-events: none;
+  animation: coinPopAnim 1s ease-out forwards;
+  z-index: 100;
 }

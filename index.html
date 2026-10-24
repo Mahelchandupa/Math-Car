@@ -1,84 +1,306 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Math Race</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600;700&family=Outfit:wght@400;600;700;800;900&family=Rajdhani:wght@600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    
+
     <main>
 
-    <img class="left_img" src="lambogini.jpg" alt="left_image">
+        <img class="left_img" src="assets/decor_left_lamborghini.jpg" alt="left_image">
 
-    <section id="game_start_container">
-       <h1 class="neon-title">
-          Math Race
-       </h1>
-       <p class="neon-subtitle">Hello, Welcome to Math Race</p>
-       <img class="game_start_car" src="doge.jpg" alt="">
+        <section id="game_start_container">
+            <h1 class="neon-title">
+                Math Race
+            </h1>
+            <p class="neon-subtitle">Hello, Welcome to Math Race</p>
+            <img class="game_start_car" src="assets/start_screen_doge.jpg" alt="">
 
-        <button class="btn-142" onclick="start_game()">
-            start game
-        </button>
-    </section>
-
-    <section id="select_car_view">
-        <img class="select_car select_car_1" src="cars/car1.png" alt="car1" onclick="select_car('cars/car1.png')">
-        <img class="select_car select_car_2" src="cars/car2.png" alt="car2" onclick="select_car('cars/car2.png')">
-        <img class="select_car select_car_3" src="cars/car3.png" alt="car3" onclick="select_car('cars/car3.png')">
-        <img class="select_car select_car_4" src="cars/car4.png" alt="car4" onclick="select_car('cars/car4.png')">
-    </section>
-    
-    <div id="active_game_container" style="display: none;">
-        <section id="math_questions_view">
-            <div class="question_container">
-                <p id="question_text">5 + 7</p>
-                <span class="timer" id="game_timer">10s</span>
-            </div>
-            <div class="answers_question_container">
-                <button class="answer" onclick="check_answer(this.innerText)">12</button>
-                <button class="answer" onclick="check_answer(this.innerText)">13</button>
-                <button class="answer" onclick="check_answer(this.innerText)">14</button>
+            <div style="display: flex; gap: 15px; margin-top: 10px;">
+                <button class="btn-142" onclick="start_game()">
+                    start game
+                </button>
+                <button class="neon-btn-instructions" onclick="open_instructions()">
+                    📖 How to Play & Coins
+                </button>
+                <button class="neon-btn-instructions" onclick="open_stats()">
+                    📊 Stats
+                </button>
             </div>
         </section>
 
-        <section id="game_view">
+        <!-- ========================================================================
+         INSTRUCTIONS & COIN GUIDE MODAL / SECTION
+         ======================================================================== -->
+        <section id="instructions_view" style="display: none;">
+            <div class="instructions_card">
+                <div class="instructions_header">
+                    <h2 class="neon-title size-md">🏁 Game Guide & Coin Rewards 🪙</h2>
+                    <button class="close_btn" onclick="close_instructions()">✖</button>
+                </div>
+                <div class="instructions_content">
+                    <div class="info_block">
+                        <h3>🎯 How To Play</h3>
+                        <p>Steer your car using <strong>A / D</strong> or <strong>Left / Right Arrow Keys</strong>. Avoid road obstacles and defeat your rival racer to cross the finish line first!</p>
+                        <p>Answer math questions quickly using your mouse or keys <strong>[1]</strong>, <strong>[2]</strong>, <strong>[3]</strong> to boost your speed. Wrong answers decelerate your car.</p>
+                    </div>
+
+                    <div class="info_block">
+                        <h3>🪙 Earning Coins by Difficulty</h3>
+                        <table class="coins_table">
+                            <thead>
+                                <tr>
+                                    <th>Difficulty</th>
+                                    <th>Per Correct Answer</th>
+                                    <th>Win Bonus</th>
+                                    <th>Max Speed</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="diff-badge beg">Beginner</span></td>
+                                    <td><strong>+10 Coins</strong></td>
+                                    <td><strong>+50 Coins</strong></td>
+                                    <td>150 km/h</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="diff-badge int">Intermediate</span></td>
+                                    <td><strong>+20 Coins</strong></td>
+                                    <td><strong>+120 Coins</strong></td>
+                                    <td>300 km/h</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="diff-badge adv">Advanced</span></td>
+                                    <td><strong>+35 Coins</strong></td>
+                                    <td><strong>+250 Coins</strong></td>
+                                    <td>500 km/h</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="streak_tip">🔥 <em>Streak Bonus: Answer 3 in a row correctly for an extra +10 Coins!</em></p>
+                    </div>
+
+                    <div class="info_block">
+                        <h3>🏎️ Unlocking Cars & Local Storage</h3>
+                        <p>Car 1 is free for all racers! Use your earned coins to purchase high-tier racing cars from the garage. Your unlocked cars, coins balance, and driving statistics are permanently saved in your browser's Local Storage.</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button class="neon-btn gold" onclick="close_instructions()">Got It! Let's Race 🏎️</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================
+         PLAYER STATISTICS MODAL
+         ======================================================================== -->
+        <section id="stats_view" style="display: none;">
+            <div class="instructions_card">
+                <div class="instructions_header">
+                    <h2 class="neon-title size-md">📊 Your Racing Statistics</h2>
+                    <button class="close_btn" onclick="close_stats()">✖</button>
+                </div>
+                <div class="stats_grid">
+                    <div class="stat_box">
+                        <span class="stat_label">Total Coins</span>
+                        <span class="stat_val gold_text" id="stat_total_coins">0 🪙</span>
+                    </div>
+                    <div class="stat_box">
+                        <span class="stat_label">Races Played</span>
+                        <span class="stat_val" id="stat_races_played">0</span>
+                    </div>
+                    <div class="stat_box">
+                        <span class="stat_label">Victories</span>
+                        <span class="stat_val green_text" id="stat_victories">0</span>
+                    </div>
+                    <div class="stat_box">
+                        <span class="stat_label">Win Rate</span>
+                        <span class="stat_val" id="stat_win_rate">0%</span>
+                    </div>
+                    <div class="stat_box">
+                        <span class="stat_label">Correct Answers</span>
+                        <span class="stat_val green_text" id="stat_correct">0</span>
+                    </div>
+                    <div class="stat_box">
+                        <span class="stat_label">Accuracy</span>
+                        <span class="stat_val" id="stat_accuracy">0%</span>
+                    </div>
+                    <div class="stat_box">
+                        <span class="stat_label">Total Distance</span>
+                        <span class="stat_val" id="stat_total_dist">0 m</span>
+                    </div>
+                    <div class="stat_box">
+                        <span class="stat_label">Cars Owned</span>
+                        <span class="stat_val" id="stat_cars_owned">1 / 4</span>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px; display: flex; justify-content: center; gap: 15px;">
+                    <button class="neon-btn pink" onclick="reset_all_stats()">Reset Progress</button>
+                    <button class="neon-btn gold" onclick="close_stats()">Close</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="select_car_view">
+            <div class="select_car_view_header">
+                <h1 class="neon-title size-md">Select Your Car</h1>
+                <h3 class="your_coin_txt">Your Coins: <span id="coins">0</span> 🪙</h3>
+            </div>
+            <div class="car_shop" id="car_shop_container">
+                <!-- Dynamically rendered via render_car_shop() in script.js -->
+            </div>
+            <div style="margin-top: 15px; display: flex; gap: 15px;">
+                <button class="neon-btn pink" onclick="back_to_home()">Back to Home</button>
+                <button class="neon-btn gold" onclick="confirm_car_selection()">Continue to Race 🏁</button>
+            </div>
+        </section>
+
+        <!-- ========================================================================
+         4. DIFFICULTY SELECTION SCREEN
+         ======================================================================== -->
+        <section id="screen_difficulty">
+            <div class="difficulty_glass_panel">
+                <h2 class="neon-title size-md">Select Your Age Group</h2>
+
+                <div class="difficulty-grid">
+                    <!-- Beginner -->
+                    <div class="difficulty-card selected" data-diff="beginner"
+                        onclick="set_difficulty(this, 'beginner')">
+                        <span class="diff-badge beg">Beginner</span>
+                        <div class="diff-age">Age 8-10</div>
+                        <p style="color: var(--text-muted)">Basic addition & subtraction questions.</p>
+                        <div class="diff-examples">
+                            <span>5 + 4 = 9</span>
+                            <span>8 - 2 = 6</span>
+                            <span>6 + 7 = 13</span>
+                        </div>
+                    </div>
+
+                    <!-- Intermediate -->
+                    <div class="difficulty-card" data-diff="intermediate"
+                        onclick="set_difficulty(this, 'intermediate')">
+                        <span class="diff-badge int">Intermediate</span>
+                        <div class="diff-age">Age 11-13</div>
+                        <p style="color: var(--text-muted)">Multiplication, division, and larger sums.</p>
+                        <div class="diff-examples">
+                            <span>12 &times; 7 = 84</span>
+                            <span>55 &divide; 5 = 11</span>
+                            <span>24 + 36 = 60</span>
+                        </div>
+                    </div>
+
+                    <!-- Advanced -->
+                    <div class="difficulty-card" data-diff="advanced" onclick="set_difficulty(this, 'advanced')">
+                        <span class="diff-badge adv">Advanced</span>
+                        <div class="diff-age">Age 14-16</div>
+                        <p style="color: var(--text-muted)">Squares, double digit factors, equations.</p>
+                        <div class="diff-examples">
+                            <span>17 &times; 23 = 391</span>
+                            <span>125 - 89 = 36</span>
+                            <span>15&sup2; = 225</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="difficulty-actions">
+                    <button class="neon-btn pink" id="btn-back-difficulty" onclick="back_to_car_select()">Back</button>
+                    <button class="neon-btn gold" id="btn-start-race" onclick="start_race_with_difficulty()">Start Race
+                        🏁</button>
+                </div>
+            </div>
+        </section>
+
+
+        <div id="active_game_container" style="display: none;">
+            <section id="game_view">
+                <img id="player_car" src="" alt="Player Car">
+                <img id="defeating_car" src="assets/opponent_car.png" alt="Defeat Car">
+                <div class="road_line_container">
+                    <div class="road_line line-1"></div>
+                    <div class="road_line line-2"></div>
+                </div>
+                <div id="obstacle_container">
+                    <div id="obstacle"></div>
+                </div>
+                <div id="paused_overlay" style="display: none;">
+                    <h2>Game Paused</h2>
+                    <button onclick="toggle_pause()">▶️ Resume</button>
+                    <button onclick="back_to_home()">Home</button>
+                </div>
+
+                <div id="finish_line">Finish Line</div>
+
+            </section>
+
+            <section id="math_questions_view">
+                <div class="question_container">
+                    <p id="question_text">5 + 7</p>
+                    <span class="timer" id="game_timer">10s</span>
+                </div>
+                <div class="answers_question_container">
+                    <button class="answer" onclick="check_answer(this)">12 <span class="key-hint">1</span></button>
+                    <button class="answer" onclick="check_answer(this)">13 <span class="key-hint">2</span></button>
+                    <button class="answer" onclick="check_answer(this)">14 <span class="key-hint">3</span></button>
+                </div>
+            </section>
+
             <div class="game_hud">
                 <div>Distance: <span id="distance_hud">0</span>m</div>
-                <div>Speed: <span id="speed_hud">0</span> km/h</div>
+                <div>Speed: <span id="speed_hud">0</span> km/h <span style="font-size: 11px; opacity: 0.85;">(Max:
+                        <span id="max_speed_hud">100</span>)</span></div>
+                <div style="color: #ffd700; font-weight: bold;">🪙 <span id="race_coins_hud">0</span></div>
                 <button id="pause_btn" onclick="toggle_pause()">⏸️ Pause</button>
             </div>
-            <img id="player_car" src="" alt="Player Car">
-            <img id="defeating_car" src="cars/car4.png" alt="Defeat Car">
-            <div class="road_line_container">
-                <div class="road_line line-1"></div>             
-                <div class="road_line line-2"></div>     
-            </div>
-            <div id="paused_overlay" style="display: none;">
-                <h2>Game Paused</h2>
-                <button onclick="toggle_pause()">▶️ Resume</button>
-                <button onclick="back_to_home()">Home</button>
+        </div>
+
+        <section id="game_over_view">
+            <h1 class="race-finish">Race Finished!</h1>
+            <p class="neon-subtitle">You drove: <span id="final_distance">0</span>m</p>
+
+            <div class="game_over_coin_summary">
+                <div class="result_row">
+                    <span>Correct Answers:</span>
+                    <span id="game_over_correct" class="green_text">0</span>
+                </div>
+                <div class="result_row">
+                    <span>Answer Coins:</span>
+                    <span id="game_over_answer_coins" class="gold_text">+0 🪙</span>
+                </div>
+                <div class="result_row">
+                    <span>Win Bonus:</span>
+                    <span id="game_over_win_coins" class="gold_text">+0 🪙</span>
+                </div>
+                <div class="result_row total_row">
+                    <span>Coins Earned:</span>
+                    <span id="game_over_earned_coins" class="gold_text">+0 🪙</span>
+                </div>
+                <div class="result_row total_row">
+                    <span>Total Coin Balance:</span>
+                    <span id="game_over_total_coins" class="green_text">0 🪙</span>
+                </div>
             </div>
 
-            <div id="finish_line">Finish Line</div>
-
+            <div style="display: flex; gap: 12px; margin-top: 15px;">
+                <button class="neon-btn gold" onclick="restart_game()">🚗 Race Again</button>
+                <button class="neon-btn pink" onclick="back_to_home()">Home</button>
+            </div>
         </section>
-    </div>
 
-    <section id="game_over_view">
-        <h1 class="race-finish">Race Finished!</h1>
-        <p class="neon-subtitle">You drove: <span id="final_distance">0</span>m</p>
-        <button onclick="restart_game()">🚗 Race Again 🚗</button>
-        <button onclick="back_to_home()">Home</button>
-
-    </section>
-
-    <img class="right_img" src="bmw.jpg" alt="right_image">
+        <img class="right_img" src="assets/decor_right_bmw.jpg" alt="right_image">
 
     </main>
 
     <script src="script.js"></script>
 </body>
+
 </html>
