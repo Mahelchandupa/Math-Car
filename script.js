@@ -634,6 +634,11 @@ function open_store() {
   switch_store_tab("cars");
 }
 
+function open_instructions() {
+  document.getElementById("instructions_view").style.display = "flex";
+  game_start_container.style.display = "none";
+}
+
 function close_instructions() {
   document.getElementById("instructions_view").style.display = "none";
   game_start_container.style.display = "flex";
