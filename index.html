@@ -10,6 +10,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600;700&family=Outfit:wght@400;600;700;800;900&family=Rajdhani:wght@600;700;800&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -24,9 +25,9 @@
                 Math Race
             </h1>
             <p class="neon-subtitle">Hello, Welcome to Math Race</p>
-            <img class="game_start_car" src="assets/start_screen_doge.jpg" alt="">
+            <img class="game_start_car" src="assets/bg car.png" alt="">
 
-            <div style="display: flex; gap: 15px; margin-top: 10px;">
+            <div style="display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap; justify-content: center;">
                 <button class="btn-142" onclick="start_game()">
                     start game
                 </button>
@@ -51,8 +52,8 @@
                 <div class="instructions_content">
                     <div class="info_block">
                         <h3>🎯 How To Play</h3>
-                        <p>Steer your car using <strong>A / D</strong> or <strong>Left / Right Arrow Keys</strong>. Avoid road obstacles and defeat your rival racer to cross the finish line first!</p>
-                        <p>Answer math questions quickly using your mouse or keys <strong>[1]</strong>, <strong>[2]</strong>, <strong>[3]</strong> to boost your speed. Wrong answers decelerate your car.</p>
+                        <p>Steer your car using <strong>A / D</strong> or <strong>Left / Right Arrow Keys</strong>. Line up at the <strong>Starting Line</strong> alongside your rival opponents and race to cross the finish line first!</p>
+                        <p>Answer math questions quickly using your mouse or keys <strong>[1]</strong>, <strong>[2]</strong>, <strong>[3]</strong> to boost your speed. Make sure not to let any opponent car reach the finish line before you!</p>
                     </div>
 
                     <div class="info_block">
@@ -60,34 +61,52 @@
                         <table class="coins_table">
                             <thead>
                                 <tr>
-                                    <th>Difficulty</th>
-                                    <th>Per Correct Answer</th>
+                                    <th>Level</th>
+                                    <th>Topic</th>
+                                    <th>Distance</th>
+                                    <th>Per Correct</th>
                                     <th>Win Bonus</th>
-                                    <th>Max Speed</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><span class="diff-badge beg">Beginner</span></td>
+                                    <td><span class="diff-badge lvl-1">Level 1</span></td>
+                                    <td>Addition</td>
+                                    <td>1,500m</td>
                                     <td><strong>+10 Coins</strong></td>
                                     <td><strong>+50 Coins</strong></td>
-                                    <td>150 km/h</td>
                                 </tr>
                                 <tr>
-                                    <td><span class="diff-badge int">Intermediate</span></td>
+                                    <td><span class="diff-badge lvl-2">Level 2</span></td>
+                                    <td>Subtraction</td>
+                                    <td>2,000m</td>
+                                    <td><strong>+15 Coins</strong></td>
+                                    <td><strong>+80 Coins</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="diff-badge lvl-3">Level 3</span></td>
+                                    <td>Multiplication</td>
+                                    <td>2,500m</td>
                                     <td><strong>+20 Coins</strong></td>
                                     <td><strong>+120 Coins</strong></td>
-                                    <td>300 km/h</td>
                                 </tr>
                                 <tr>
-                                    <td><span class="diff-badge adv">Advanced</span></td>
-                                    <td><strong>+35 Coins</strong></td>
-                                    <td><strong>+250 Coins</strong></td>
-                                    <td>500 km/h</td>
+                                    <td><span class="diff-badge lvl-4">Level 4</span></td>
+                                    <td>Division</td>
+                                    <td>3,500m</td>
+                                    <td><strong>+30 Coins</strong></td>
+                                    <td><strong>+200 Coins</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="diff-badge lvl-5">Level 5</span></td>
+                                    <td>Mixed &amp; Boss</td>
+                                    <td>3,500m</td>
+                                    <td><strong>+50 Coins</strong></td>
+                                    <td><strong>+350 Coins</strong></td>
                                 </tr>
                             </tbody>
                         </table>
-                        <p class="streak_tip">🔥 <em>Streak Bonus: Answer 3 in a row correctly for an extra +10 Coins!</em></p>
+                        <p class="streak_tip">🔥 <em>Streak Bonus: Answer 3 in a row correctly for an extra bonus!</em></p>
                     </div>
 
                     <div class="info_block">
@@ -141,7 +160,11 @@
                     </div>
                     <div class="stat_box">
                         <span class="stat_label">Cars Owned</span>
-                        <span class="stat_val" id="stat_cars_owned">1 / 4</span>
+                        <span class="stat_val" id="stat_cars_owned">1 / 10</span>
+                    </div>
+                    <div class="stat_box">
+                        <span class="stat_label">Roads Owned</span>
+                        <span class="stat_val" id="stat_roads_owned">1 / 5</span>
                     </div>
                 </div>
                 <div style="text-align: center; margin-top: 20px; display: flex; justify-content: center; gap: 15px;">
@@ -153,36 +176,72 @@
 
         <section id="select_car_view">
             <div class="select_car_view_header">
-                <h1 class="neon-title size-md">Select Your Car</h1>
+                <h1 class="neon-title size-md" id="store_title">Game Store & Garage</h1>
                 <h3 class="your_coin_txt">Your Coins: <span id="coins">0</span> 🪙</h3>
             </div>
-            <div class="car_shop" id="car_shop_container">
-                <!-- Dynamically rendered via render_car_shop() in script.js -->
+
+            <!-- Store Tabs: Cars vs Road Tracks -->
+            <div class="store_tab_bar">
+                <button class="store_tab_btn active" id="tab_btn_cars" onclick="switch_store_tab('cars')">🏎️ Cars</button>
+                <button class="store_tab_btn" id="tab_btn_roads" onclick="switch_store_tab('roads')">🛣️ Road Designs</button>
             </div>
+
+            <!-- Tab 1: Car Shop Swiper -->
+            <div id="store_tab_cars_content" class="store_tab_content active">
+                <div class="car_shop_swiper_container">
+                    <div class="swiper carShopSwiper">
+                        <div class="swiper-wrapper" id="car_shop_container">
+                            <!-- Dynamically rendered via render_car_shop() in script.js as swiper-slide -->
+                        </div>
+                        <!-- Navigation Buttons -->
+                        <div class="swiper-button-prev car-shop-prev"></div>
+                        <div class="swiper-button-next car-shop-next"></div>
+                        <!-- Pagination -->
+                        <div class="swiper-pagination car-shop-pagination"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Road Tracks Swiper -->
+            <div id="store_tab_roads_content" class="store_tab_content" style="display: none;">
+                <div class="car_shop_swiper_container">
+                    <div class="swiper roadShopSwiper">
+                        <div class="swiper-wrapper" id="road_shop_container">
+                            <!-- Dynamically rendered via render_road_shop() in script.js as swiper-slide -->
+                        </div>
+                        <!-- Navigation Buttons -->
+                        <div class="swiper-button-prev road-shop-prev"></div>
+                        <div class="swiper-button-next road-shop-next"></div>
+                        <!-- Pagination -->
+                        <div class="swiper-pagination road-shop-pagination"></div>
+                    </div>
+                </div>
+            </div>
+
             <div style="margin-top: 15px; display: flex; gap: 15px;">
                 <button class="neon-btn pink" onclick="back_to_home()">Back to Home</button>
-                <button class="neon-btn gold" onclick="confirm_car_selection()">Continue to Race 🏁</button>
+                <button class="neon-btn gold" id="store_continue_btn" onclick="confirm_car_selection()">Continue to Race 🏁</button>
             </div>
         </section>
 
         <!-- ========================================================================
-         4. DIFFICULTY SELECTION SCREEN
+         4. DIFFICULTY SELECTION SCREEN (Beginner, Intermediate, Advanced)
          ======================================================================== -->
         <section id="screen_difficulty">
             <div class="difficulty_glass_panel">
-                <h2 class="neon-title size-md">Select Your Age Group</h2>
+                <h2 class="neon-title size-md">Select Difficulty</h2>
 
                 <div class="difficulty-grid">
                     <!-- Beginner -->
                     <div class="difficulty-card selected" data-diff="beginner"
                         onclick="set_difficulty(this, 'beginner')">
                         <span class="diff-badge beg">Beginner</span>
-                        <div class="diff-age">Age 8-10</div>
-                        <p style="color: var(--text-muted)">Basic addition & subtraction questions.</p>
+                        <div class="diff-speed">Base Speed: 30 KM/H</div>
                         <div class="diff-examples">
-                            <span>5 + 4 = 9</span>
-                            <span>8 - 2 = 6</span>
-                            <span>6 + 7 = 13</span>
+                            <span>2 + 3</span>
+                            <span>5 - 4</span>
+                            <span>5 * 3</span>
+                            <span>10 / 5</span>
                         </div>
                     </div>
 
@@ -190,32 +249,52 @@
                     <div class="difficulty-card" data-diff="intermediate"
                         onclick="set_difficulty(this, 'intermediate')">
                         <span class="diff-badge int">Intermediate</span>
-                        <div class="diff-age">Age 11-13</div>
-                        <p style="color: var(--text-muted)">Multiplication, division, and larger sums.</p>
+                        <div class="diff-speed">Base Speed: 40 KM/H</div>
                         <div class="diff-examples">
-                            <span>12 &times; 7 = 84</span>
-                            <span>55 &divide; 5 = 11</span>
-                            <span>24 + 36 = 60</span>
+                            <span>24 + 18</span>
+                            <span>65 − 23</span>
+                            <span>7 × 8</span>
+                            <span>48 ÷ 6</span>
                         </div>
                     </div>
 
                     <!-- Advanced -->
                     <div class="difficulty-card" data-diff="advanced" onclick="set_difficulty(this, 'advanced')">
                         <span class="diff-badge adv">Advanced</span>
-                        <div class="diff-age">Age 14-16</div>
-                        <p style="color: var(--text-muted)">Squares, double digit factors, equations.</p>
+                        <div class="diff-speed">Base Speed: 60 KM/H</div>
                         <div class="diff-examples">
-                            <span>17 &times; 23 = 391</span>
-                            <span>125 - 89 = 36</span>
-                            <span>15&sup2; = 225</span>
+                            <span>142 + 89</span>
+                            <span>215 − 78</span>
+                            <span>16 × 12</span>
+                            <span>12² / 144 ÷ 12</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="difficulty-actions">
-                    <button class="neon-btn pink" id="btn-back-difficulty" onclick="back_to_car_select()">Back</button>
-                    <button class="neon-btn gold" id="btn-start-race" onclick="start_race_with_difficulty()">Start Race
-                        🏁</button>
+                    <button class="neon-btn pink" onclick="back_to_car_select()">Back to Store</button>
+                    <button class="neon-btn gold" onclick="confirm_difficulty_selection()">Choose Level 🏁</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================
+         5. LEVEL SELECTION SCREEN (Levels 1 to 5)
+         ======================================================================== -->
+        <section id="screen_levels" style="display: none;">
+            <div class="difficulty_glass_panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h2 class="neon-title size-md" style="margin: 0;">Select Level (<span id="levels_diff_title">Beginner</span>)</h2>
+                    <span id="diff_tag_indicator" class="diff-badge beg">Beginner</span>
+                </div>
+
+                <div class="difficulty-grid levels-5-grid" id="levels_container">
+                    <!-- Dynamically rendered via render_level_cards() in script.js -->
+                </div>
+
+                <div class="difficulty-actions">
+                    <button class="neon-btn pink" onclick="back_to_difficulty_select()">Back</button>
+                    <button class="neon-btn gold" id="btn-start-race" onclick="start_race_with_level()">Start Race 🏁</button>
                 </div>
             </div>
         </section>
@@ -238,6 +317,10 @@
                     <button onclick="back_to_home()">Home</button>
                 </div>
 
+                <div id="start_line">START</div>
+                <div id="traffic_container"></div>
+                <div id="track_opponents_container"></div>
+                <canvas id="weather_canvas"></canvas>
                 <div id="finish_line">Finish Line</div>
 
             </section>
@@ -255,7 +338,8 @@
             </section>
 
             <div class="game_hud">
-                <div>Distance: <span id="distance_hud">0</span>m</div>
+                <div id="level_hud_badge" style="color: #00ffff; font-weight: bold; letter-spacing: 0.5px;">LEVEL 1</div>
+                <div>Distance: <span id="distance_hud">0</span>m / <span id="target_dist_hud">1500</span>m</div>
                 <div>Speed: <span id="speed_hud">0</span> km/h <span style="font-size: 11px; opacity: 0.85;">(Max:
                         <span id="max_speed_hud">100</span>)</span></div>
                 <div style="color: #ffd700; font-weight: bold;">🪙 <span id="race_coins_hud">0</span></div>
@@ -300,6 +384,7 @@
 
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
 
