@@ -35,14 +35,60 @@ main {
 #game_start_container {
   flex: 1;
   height: 100vh;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* border-radius: 40px; */
-  /* border: 5px solid #d4a373; */
+  overflow: hidden;
   background: #060503;
   box-shadow: 0 0 25px rgba(212, 163, 115, 0.4);
+}
+
+.game_start_car,
+.section_bg_video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.game_start_overlay,
+.section_dark_overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(6, 5, 3, 0.45) 0%, rgba(6, 5, 3, 0.88) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.game_start_content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  padding: 20px;
+  width: 100%;
+  max-width: 600px;
+  height: 60%;
+}
+
+.header_text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -30px;
+  margin-bottom: 25px;
 }
 
 .neon-title {
@@ -53,8 +99,10 @@ main {
   font-family: var(--font-race);
   font-weight: 800;
   letter-spacing: 1.5px;
-  font-size: 38px;
-  margin-top: 0;
+  font-size: 46px;
+  margin: 0 0 2px 0;
+  line-height: 1.1;
+  text-shadow: 0 0 25px rgba(3, 244, 63, 0.4);
 }
 
 .neon-subtitle {
@@ -64,14 +112,34 @@ main {
   -webkit-text-fill-color: transparent;
   font-family: var(--font-main);
   font-weight: 600;
-  font-size: 20px;
-  margin-bottom: 20px;
+  font-size: 19px;
+  margin: 0;
+  line-height: 1.2;
+  text-shadow: 0 0 20px rgba(3, 228, 244, 0.4);
 }
 
-.game_start_car {
-  width: 500px;
-  height: 350px;
-  margin-bottom: 40px;
+/* Home Screen Buttons Layout: Column with Unified Width */
+.game_start_buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.game_start_buttons .btn-142,
+.game_start_buttons .neon-btn-instructions {
+  width: 250px;
+  box-sizing: border-box;
+}
+
+.game_start_buttons .start-action-btn {
+  height: 44px;
+  font-size: 15px;
+}
+
+.game_start_buttons .start-game-btn {
+  height: 44px;
 }
 
 .btn-142 {
@@ -160,21 +228,31 @@ main {
 /* Car Select View */
 #select_car_view { 
   width: 740px;
-  min-height: 100vh;
+  height: 100vh;
+  position: relative;
   display: none;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  /* border-radius: 40px; */
-  /* border: 5px solid #d4a373; */
   padding: 20px 30px;
-  background: #0d1117;
+  background: transparent;
   gap: 15px;
+  overflow: hidden;
   box-shadow: 0 0 35px rgba(212, 163, 115, 0.4);
+  border-left: 4px solid #d4a373;
+  border-right: 4px solid #d4a373;
+  box-sizing: border-box;
 }
 
 .select_car_view_header {
   text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+#select_car_view > *:not(.section_bg_video):not(.section_dark_overlay) {
+  position: relative;
+  z-index: 2;
 }
 
 .your_coin_txt {
@@ -383,6 +461,7 @@ main {
   border-radius: 50%;
   box-shadow: 0 0 12px rgba(212, 163, 115, 0.5);
   transition: all 0.2s ease;
+  z-index: 9999;
 }
 
 .car_shop_swiper_container .car-shop-prev:after,
@@ -428,6 +507,11 @@ main {
   width: 24px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+.car_card {
+  padding: 15px;
+  border-radius: 5px;
 }
 
 .car_card:hover {
@@ -495,6 +579,7 @@ main {
   color: #c9d1d9;
   margin-top: 6px;
   font-family: 'Outfit', sans-serif;
+  text-align: center;
 }
 
 .car_price_tag {
@@ -502,6 +587,7 @@ main {
   font-weight: bold;
   color: #ffd700;
   margin: 4px 0 8px 0;
+  text-align: center;
 }
 
 .car_action_btn {
@@ -989,21 +1075,26 @@ main {
 
 /* Game Over Screen */
 #game_over_view {
-  flex: 1;
-  height: 500px;
+  width: 740px;
+  height: 100vh;
+  position: relative;
   display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 40px;
-  border: 5px solid #d4a373;
   text-align: center;
   box-shadow: 0 0 35px rgba(212, 163, 115, 0.4);
   color: #5c3a21;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('assets/game_over_bg_gtr.jpg');
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
+  background: transparent;
+  border-left: 4px solid #d4a373;
+  border-right: 4px solid #d4a373;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+#game_over_view > *:not(.section_bg_video):not(.section_dark_overlay) {
+  position: relative;
+  z-index: 2;
 }
 
 
@@ -1147,12 +1238,14 @@ main {
 #screen_difficulty, #screen_levels {
   width: 760px;
   max-width: 95vw;
+  position: relative;
   display: none;
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: #0d1117;
+  background: transparent;
   box-sizing: border-box;
+  overflow: hidden;
   box-shadow: 0 0 25px rgba(212, 163, 115, 0.3);
   border-left: 4px solid #d4a373;
   border-right: 4px solid #d4a373;
@@ -1164,7 +1257,9 @@ main {
 
 .difficulty_glass_panel {
   width: 100%;
-  background: #0d1117;
+  position: relative;
+  z-index: 2;
+  background: transparent;
   padding: 24px;
 }
 
@@ -1360,28 +1455,34 @@ main {
 /* Instructions & Stats Modal Layout */
 #instructions_view, #stats_view {
   width: 740px;
-  min-height: 480px;
+  height: 100vh;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 20;
+  overflow: hidden;
 }
 
 .instructions_card {
   width: 100%;
-  background: #0d1117;
-  border: 4px solid #d4a373;
-  border-radius: 28px;
+  height: 100vh;
+  position: relative;
+  z-index: 2;
+  background: transparent;
+  border-left: 4px solid #d4a373;
+  border-right: 4px solid #d4a373;
   padding: 24px 30px;
   box-shadow: 0 0 35px rgba(212, 163, 115, 0.45);
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .instructions_header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 55px;
   border-bottom: 1px solid #30363d;
   padding-bottom: 10px;
 }
@@ -1416,17 +1517,16 @@ main {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-height: 360px;
-  overflow-y: auto;
+  min-height: 100vh;
   padding-right: 8px;
 }
 
-.instructions_content::-webkit-scrollbar {
+.instructions_card::-webkit-scrollbar {
   width: 6px;
 }
-.instructions_content::-webkit-scrollbar-thumb {
-  background: #d4a373;
-  border-radius: 3px;
+.instructions_card::-webkit-scrollbar-thumb {
+  background: #d39556;
+  /* border-radius: 3px; */
 }
 
 .info_block {
@@ -1570,4 +1670,221 @@ main {
   pointer-events: none;
   animation: coinPopAnim 1s ease-out forwards;
   z-index: 100;
+}
+
+/* ============================================================================
+   BONUS COINS LEVELS BASED ON HIGH SCORE (STORE & GARAGE)
+   ============================================================================ */
+.bonus_levels_panel {
+  width: 100%;
+  max-width: 700px;
+  background: rgba(13, 17, 23, 0.95);
+  border: 2px solid #30363d;
+  border-radius: 20px;
+  padding: 16px 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.15);
+}
+
+.bonus_levels_header {
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.bonus_levels_title {
+  font-family: var(--font-race);
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffd700;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+.bonus_high_score_badge {
+  display: inline-block;
+  background: rgba(255, 215, 0, 0.12);
+  border: 1px solid #ffd700;
+  color: #f0f6fc;
+  font-size: 13px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+
+.bonus_high_score_badge strong {
+  color: #ffd700;
+  font-size: 15px;
+}
+
+.bonus_levels_grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.bonus_card {
+  background: #161b22;
+  border: 2px solid #30363d;
+  border-radius: 16px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+
+.bonus_card.unlocked {
+  border-color: #ffd700;
+  background: linear-gradient(180deg, rgba(22, 27, 34, 0.95), rgba(45, 36, 12, 0.85));
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.25);
+}
+
+.bonus_card.unlocked:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+}
+
+.bonus_card.locked {
+  opacity: 0.65;
+  filter: grayscale(40%);
+}
+
+.bonus_badge {
+  font-family: var(--font-race);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.bonus_badge.b1 {
+  background: rgba(56, 139, 253, 0.2);
+  color: #58a6ff;
+  border: 1px solid #388bfd;
+}
+
+.bonus_badge.b2 {
+  background: rgba(187, 128, 9, 0.2);
+  color: #ffd700;
+  border: 1px solid #ffd700;
+}
+
+.bonus_badge.b3 {
+  background: rgba(247, 120, 186, 0.2);
+  color: #ff7b72;
+  border: 1px solid #ff7b72;
+}
+
+.bonus_name {
+  font-size: 17px;
+  font-weight: 800;
+  color: #f0f6fc;
+  margin: 0 0 6px 0;
+}
+
+.bonus_coins_reward {
+  font-size: 14px;
+  color: #ffd700;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.bonus_req_score {
+  font-size: 12px;
+  color: #8b949e;
+  margin-bottom: 12px;
+}
+
+.bonus_req_score strong {
+  color: #00ffaa;
+}
+
+.bonus_play_btn {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.bonus_play_btn.active {
+  background: linear-gradient(135deg, #ffd700, #ff9900);
+  color: #060503;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+}
+
+.bonus_play_btn.active:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 18px rgba(255, 215, 0, 0.8);
+}
+
+.bonus_play_btn.disabled {
+  background: #21262d;
+  color: #484f58;
+  cursor: not-allowed;
+}
+
+.bonus_play_btn.completed {
+  background: rgba(35, 134, 54, 0.25);
+  color: #3fb950;
+  border: 1px solid #3fb950;
+  cursor: not-allowed;
+}
+
+.bonus_card.completed {
+  border-color: #3fb950;
+  background: linear-gradient(180deg, rgba(22, 27, 34, 0.95), rgba(15, 38, 20, 0.85));
+}
+
+/* Track Golden Coin Collectible Element */
+.track_coin_item {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fffb8f, #ffd700 60%, #b8860b 100%);
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.9), inset 0 0 4px #ffffff;
+  border: 2px solid #fff275;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 13px;
+  color: #573a08;
+  user-select: none;
+  pointer-events: none;
+  z-index: 15;
+  animation: coinGleam 1.2s infinite ease-in-out alternate;
+}
+
+@keyframes coinGleam {
+  0% { transform: scale(1) rotate(0deg); box-shadow: 0 0 10px rgba(255, 215, 0, 0.7); }
+  100% { transform: scale(1.08) rotate(10deg); box-shadow: 0 0 18px rgba(255, 215, 0, 1); }
+}
+
+@media screen and (max-width: 600px) {
+  .bonus_levels_grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
 }

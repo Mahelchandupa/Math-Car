@@ -201,8 +201,48 @@ const ROAD_CATALOG = [
   }
 ];
 
+// --- Bonus Coin Rush Levels Configuration (Unlocked by High Score) ---
+// No math questions, steer with arrow keys / A & D, collect coins on the track!
+const BONUS_LEVELS_CONFIG = [
+  {
+    id: 1,
+    name: "Golden Sprint",
+    badgeClass: "b1",
+    requiredScore: 1000,
+    durationSec: 25,
+    maxBonusCoins: 120,
+    speed: 55,
+    description: "Collect up to 120 golden coins."
+  },
+  {
+    id: 2,
+    name: "Treasure Highway",
+    badgeClass: "b2",
+    requiredScore: 3000,
+    durationSec: 30,
+    maxBonusCoins: 250,
+    speed: 70,
+    description: "Collect up to 250 golden coins."
+  },
+  {
+    id: 3,
+    name: "Jackpot Mania",
+    badgeClass: "b3",
+    requiredScore: 6000,
+    durationSec: 35,
+    maxBonusCoins: 500,
+    speed: 85,
+    description: "Collect up to 500 golden coins."
+  }
+];
+
 let userGameData = {
   coins: 0,
+  highScores: {
+    best: 0,
+    levels: {}
+  },
+  completedBonusLevels: [], // IDs of bonus levels player has already played & collected coins from
   selectedCarId: "car_1",
   unlockedCars: ["car_1"],
   selectedRoadId: "classic",
@@ -238,6 +278,11 @@ function load_user_data() {
       const parsed = JSON.parse(raw);
       userGameData = {
         coins: typeof parsed.coins === "number" ? parsed.coins : 0,
+        highScores: {
+          best: typeof parsed.highScores?.best === "number" ? parsed.highScores.best : (typeof parsed.highScore === "number" ? parsed.highScore : 0),
+          levels: parsed.highScores?.levels && typeof parsed.highScores.levels === "object" ? parsed.highScores.levels : {}
+        },
+        completedBonusLevels: Array.isArray(parsed.completedBonusLevels) ? parsed.completedBonusLevels : [],
         selectedCarId: parsed.selectedCarId || "car_1",
         unlockedCars: Array.isArray(parsed.unlockedCars) ? parsed.unlockedCars : ["car_1"],
         selectedRoadId: parsed.selectedRoadId || "classic",
@@ -283,6 +328,32 @@ let round_wrong = 0;
 let round_streak = 0;
 let round_coins_earned = 0;
 let round_answer_coins = 0;
+let round_start_timestamp = 0;
+let current_race_score = 0;
+
+// --- Bonus Coin Rush State Variables ---
+let is_bonus_mode = false;
+let active_bonus_level = null;
+let bonus_coins_collected = 0;
+let bonus_time_left = 0;
+let active_track_coins = [];
+
+// High Score Formula Calculator:
+// Base = Distance + (Correct * 100 * Streak Multiplier) - (Wrong * 30) + Speed Bonus
+// If Player Won: + Victory Bonus (500 pts)
+// Applied Multiplier based on Difficulty: Beginner 1.0x, Intermediate 1.5x, Advanced 2.0x
+function calculate_current_score(isFinishWon = false) {
+  if (is_bonus_mode) {
+    return bonus_coins_collected * 20;
+  }
+  const diffMultiplier = selected_difficulty === "advanced" ? 2.0 : (selected_difficulty === "intermediate" ? 1.5 : 1.0);
+  const streakMult = 1 + (round_streak * 0.1);
+  const mathPoints = Math.max(0, (round_correct * 100 * streakMult) - (round_wrong * 30));
+  const distancePoints = Math.floor(distance);
+  const victoryPoints = isFinishWon ? 500 : 0;
+  const subTotal = distancePoints + mathPoints + victoryPoints;
+  return Math.max(0, Math.floor(subTotal * diffMultiplier));
+}
 
 // --- Game State Variables ---
 let speed = 30;            // Starting speed in km/h
@@ -397,7 +468,7 @@ function render_car_shop() {
       buttonHtml = `<button class="car_action_btn btn_select" onclick="choose_car('${car.id}')">Select</button>`;
     } else {
       buttonHtml = `<button class="car_action_btn btn_buy" ${canAfford ? "" : "disabled"} onclick="buy_car('${car.id}')">
-        ${canAfford ? `Buy 🪙 ${car.price}` : `Need 🪙 ${car.price}`}
+        ${canAfford ? `Buy <i class="fa fa-circle" style="color: #ffd700;"></i> ${car.price}` : `Need <i class="fa fa-circle" style="color: #ffd700;"></i> ${car.price}`}
       </button>`;
     }
 
@@ -407,7 +478,7 @@ function render_car_shop() {
         ${!isUnlocked ? `<div class="lock_overlay_badge">🔒</div>` : ""}
       </div>
       <div class="car_title_name">${car.name}</div>
-      <div class="car_price_tag">${car.price === 0 ? "FREE" : `🪙 ${car.price}`}</div>
+      <div class="car_price_tag">${car.price === 0 ? "FREE" : `<i class="fa fa-circle" style="color: #ffd700;"></i> ${car.price}`}</div>
       ${buttonHtml}
     `;
 
@@ -538,7 +609,7 @@ function render_road_shop() {
       buttonHtml = `<button class="car_action_btn btn_select" onclick="choose_road('${road.id}')">Equip</button>`;
     } else {
       buttonHtml = `<button class="car_action_btn btn_buy" ${canAfford ? "" : "disabled"} onclick="buy_road('${road.id}')">
-        ${canAfford ? `Buy 🪙 ${road.price}` : `Need 🪙 ${road.price}`}
+        ${canAfford ? `Buy <i class="fa fa-circle" style="color: #ffd700;"></i> ${road.price}` : `Need <i class="fa fa-circle" style="color: #ffd700;"></i> ${road.price}`}
       </button>`;
     }
 
@@ -552,7 +623,7 @@ function render_road_shop() {
       </div>
       <div class="car_title_name">${road.name}</div>
       <div style="font-size: 11px; color: #8b949e; text-align: center; margin: 3px 0 6px 0; min-height: 28px;">${road.desc}</div>
-      <div class="car_price_tag">${road.price === 0 ? "FREE" : `🪙 ${road.price}`}</div>
+      <div class="car_price_tag">${road.price === 0 ? "FREE" : `<i class="fa fa-circle" style="color: #ffd700;"></i> ${road.price}`}</div>
       ${buttonHtml}
     `;
 
@@ -603,22 +674,168 @@ function switch_store_tab(tab) {
   current_store_tab = tab;
   const tabCarsBtn = document.getElementById("tab_btn_cars");
   const tabRoadsBtn = document.getElementById("tab_btn_roads");
+  const tabBonusBtn = document.getElementById("tab_btn_bonus");
   const tabCarsContent = document.getElementById("store_tab_cars_content");
   const tabRoadsContent = document.getElementById("store_tab_roads_content");
+  const tabBonusContent = document.getElementById("store_tab_bonus_content");
+
+  // Deactivate all tabs
+  [tabCarsBtn, tabRoadsBtn, tabBonusBtn].forEach(b => b && b.classList.remove("active"));
+  [tabCarsContent, tabRoadsContent, tabBonusContent].forEach(c => c && (c.style.display = "none"));
 
   if (tab === "cars") {
     if (tabCarsBtn) tabCarsBtn.classList.add("active");
-    if (tabRoadsBtn) tabRoadsBtn.classList.remove("active");
     if (tabCarsContent) tabCarsContent.style.display = "flex";
-    if (tabRoadsContent) tabRoadsContent.style.display = "none";
     render_car_shop();
-  } else {
+  } else if (tab === "roads") {
     if (tabRoadsBtn) tabRoadsBtn.classList.add("active");
-    if (tabCarsBtn) tabCarsBtn.classList.remove("active");
     if (tabRoadsContent) tabRoadsContent.style.display = "flex";
-    if (tabCarsContent) tabCarsContent.style.display = "none";
     render_road_shop();
+  } else if (tab === "bonus") {
+    if (tabBonusBtn) tabBonusBtn.classList.add("active");
+    if (tabBonusContent) tabBonusContent.style.display = "flex";
+    render_bonus_levels();
   }
+}
+
+// --- Render Collect Bonus Coins Levels Unlocked by High Score ---
+function render_bonus_levels() {
+  const container = document.getElementById("bonus_levels_container");
+  const hsValEl = document.getElementById("store_bonus_high_score_val");
+  const bestScore = userGameData.highScores?.best || 0;
+  const completedList = userGameData.completedBonusLevels || [];
+
+  if (hsValEl) hsValEl.innerText = bestScore.toLocaleString();
+  if (!container) return;
+  container.innerHTML = "";
+
+  BONUS_LEVELS_CONFIG.forEach(lvl => {
+    const isUnlocked = bestScore >= lvl.requiredScore;
+    const isCompleted = completedList.includes(lvl.id);
+    const progressPct = Math.min(100, Math.round((bestScore / lvl.requiredScore) * 100));
+
+    let cardClass = "bonus_card";
+    if (isCompleted) {
+      cardClass += " completed";
+    } else if (isUnlocked) {
+      cardClass += " unlocked";
+    } else {
+      cardClass += " locked";
+    }
+
+    let buttonHtml = "";
+    if (isCompleted) {
+      buttonHtml = `<button class="bonus_play_btn completed" disabled>Coins Collected</button>`;
+    } else if (isUnlocked) {
+      buttonHtml = `<button class="bonus_play_btn active" onclick="start_bonus_coin_rush(${lvl.id})">Collect Coins!</button>`;
+    } else {
+      buttonHtml = `<button class="bonus_play_btn disabled" disabled>Need ${lvl.requiredScore.toLocaleString()} pts</button>`;
+    }
+
+    const card = document.createElement("div");
+    card.className = cardClass;
+    card.innerHTML = `
+      <span class="bonus_badge ${lvl.badgeClass}">Bonus Level ${lvl.id}</span>
+      <h3 class="bonus_name">${lvl.name}</h3>
+      <div class="bonus_coins_reward">${isCompleted ? "All Coins Claimed" : `<i class="fa fa-circle" style="color: #ffd700; margin-right: 4px;"></i>Up to ${lvl.maxBonusCoins} Bonus Coins`}</div>
+      <div class="bonus_req_score">
+        ${isCompleted ? "<strong style='color:#3fb950;'>Claimed &amp; Completed</strong>" : `Unlock Req: <strong>${lvl.requiredScore.toLocaleString()} pts</strong>`}
+      </div>
+      <div style="font-size: 11px; color: #8b949e; margin-bottom: 12px; line-height: 1.3;">
+        ${lvl.description} (${lvl.durationSec}s Timer)
+      </div>
+      ${buttonHtml}
+    `;
+    container.appendChild(card);
+  });
+}
+
+// Launches a special High-Score Bonus Coin Rush track (No Math Questions!)
+function start_bonus_coin_rush(bonusLevelId) {
+  const config = BONUS_LEVELS_CONFIG.find(b => b.id === bonusLevelId);
+  if (!config) return;
+
+  const completedList = userGameData.completedBonusLevels || [];
+  if (completedList.includes(bonusLevelId)) {
+    alert("You have already completed this bonus level and collected all bonus coins!");
+    return;
+  }
+
+  const bestScore = userGameData.highScores?.best || 0;
+  if (bestScore < config.requiredScore) {
+    alert(`This bonus level requires a High Score of ${config.requiredScore} points to unlock!`);
+    return;
+  }
+
+  is_bonus_mode = true;
+  active_bonus_level = config;
+  bonus_coins_collected = 0;
+  bonus_time_left = config.durationSec;
+  active_track_coins = [];
+
+  // Setup car visual from user selection
+  const activeCar = CAR_CATALOG.find(c => c.id === userGameData.selectedCarId) || CAR_CATALOG[0];
+  player_car.src = activeCar.src;
+  apply_road_theme(userGameData.selectedRoadId);
+
+  // Switch screens
+  select_car_view.style.display = "none";
+  active_game_container.style.display = "flex";
+
+  // Hide math question interface entirely in bonus coin rush mode
+  math_questions_view.style.display = "none";
+
+  // HUD updates
+  const levelHudBadge = document.getElementById("level_hud_badge");
+  if (levelHudBadge) {
+    levelHudBadge.innerHTML = `<i class="fa fa-circle" style="color: #ffd700; margin-right: 5px;"></i>BONUS RUSH: ${config.name.toUpperCase()}`;
+    levelHudBadge.style.color = "#ffd700";
+  }
+
+  const targetDistHud = document.getElementById("target_dist_hud");
+  if (targetDistHud) targetDistHud.innerText = "COIN RUSH";
+
+  const maxSpeedHud = document.getElementById("max_speed_hud");
+  if (maxSpeedHud) maxSpeedHud.innerText = config.speed;
+
+  const currentScoreHud = document.getElementById("current_score_hud");
+  if (currentScoreHud) currentScoreHud.innerText = "0";
+
+  const highScoreHud = document.getElementById("high_score_hud");
+  if (highScoreHud) highScoreHud.innerText = bestScore;
+
+  const raceCoinsHud = document.getElementById("race_coins_hud");
+  if (raceCoinsHud) raceCoinsHud.innerText = "0";
+
+  // Init driving variables for bonus rush
+  speed = config.speed;
+  max_speed = config.speed;
+  distance = 0;
+  lane = 1;
+  player_car.style.left = lane_positions[lane];
+  player_car.style.bottom = "40px";
+  player_car.style.opacity = "1";
+  player_car.classList.remove("car-hit");
+
+  // Clear opponents and obstacles
+  if (track_opponents_container) track_opponents_container.innerHTML = "";
+  if (traffic_container) traffic_container.innerHTML = "";
+  obstacle_container.innerHTML = "";
+  active_opponents = [];
+  if (start_line) start_line.style.display = "none";
+  const finishLineEl = document.getElementById("finish_line");
+  if (finishLineEl) finishLineEl.style.display = "none";
+
+  stop_weather();
+
+  game_active = true;
+  game_paused = false;
+
+  clearInterval(game_loop_interval);
+  clearInterval(timer_interval);
+
+  game_loop_interval = setInterval(bonus_game_loop, 30);
+  timer_interval = setInterval(update_bonus_timer, 1000);
 }
 
 function open_store() {
@@ -646,7 +863,9 @@ function close_instructions() {
 
 function open_stats() {
   const stats = userGameData.stats;
-  document.getElementById("stat_total_coins").innerText = `${userGameData.coins} 🪙`;
+  const statHs = document.getElementById("stat_high_score");
+  if (statHs) statHs.innerText = `${(userGameData.highScores?.best || 0).toLocaleString()} `;
+  document.getElementById("stat_total_coins").innerHTML = `${userGameData.coins} <i class="fa fa-circle" style="color: #ffd700; font-size: 15px;"></i>`;
   document.getElementById("stat_races_played").innerText = stats.racesPlayed;
   document.getElementById("stat_victories").innerText = stats.victories;
 
@@ -678,6 +897,11 @@ function reset_all_stats() {
   if (confirm("Are you sure you want to reset all your progress, coins, and unlocked cars?")) {
     userGameData = {
       coins: 0,
+      highScores: {
+        best: 0,
+        levels: {}
+      },
+      completedBonusLevels: [],
       selectedCarId: "car_1",
       unlockedCars: ["car_1"],
       selectedRoadId: "classic",
@@ -1270,12 +1494,24 @@ function init_game() {
     finish_line.style.top = "-50px";
   }
 
-  // Reset in-race statistics and coin trackers
+  // Reset in-race statistics, score and coin trackers
+  is_bonus_mode = false;
+  active_bonus_level = null;
+  active_track_coins = [];
+  math_questions_view.style.display = "flex";
+
   round_correct = 0;
   round_wrong = 0;
   round_streak = 0;
   round_coins_earned = 0;
   round_answer_coins = 0;
+  round_start_timestamp = Date.now();
+
+  const currentScoreHud = document.getElementById("current_score_hud");
+  if (currentScoreHud) currentScoreHud.innerText = "0";
+
+  const highScoreHud = document.getElementById("high_score_hud");
+  if (highScoreHud) highScoreHud.innerText = (userGameData.highScores?.best || 0).toLocaleString();
 
   const raceCoinsHud = document.getElementById("race_coins_hud");
   if (raceCoinsHud) {
@@ -1347,6 +1583,10 @@ function game_loop() {
   // 8. Update HUD displays
   distance_hud.innerText = Math.floor(distance);
   speed_hud.innerText = Math.floor(speed);
+  const curScoreEl = document.getElementById("current_score_hud");
+  if (curScoreEl) {
+    curScoreEl.innerText = calculate_current_score(false).toLocaleString();
+  }
 
   // 9. Update Finish Line position and check for game completion
   const finish_line = document.getElementById("finish_line");
@@ -1668,6 +1908,50 @@ function end_game(playerWon) {
   
   final_distance.innerText = Math.floor(distance);
 
+  // If concluding a bonus coin rush mode run
+  if (is_bonus_mode) {
+    const totalEarnedRound = bonus_coins_collected;
+    userGameData.coins += totalEarnedRound;
+
+    // Mark this bonus level as permanently completed once played!
+    if (active_bonus_level) {
+      if (!Array.isArray(userGameData.completedBonusLevels)) {
+        userGameData.completedBonusLevels = [];
+      }
+      if (!userGameData.completedBonusLevels.includes(active_bonus_level.id)) {
+        userGameData.completedBonusLevels.push(active_bonus_level.id);
+      }
+    }
+    save_user_data();
+
+    const elCorrect = document.getElementById("game_over_correct");
+    const elAnswerCoins = document.getElementById("game_over_answer_coins");
+    const elWinCoins = document.getElementById("game_over_win_coins");
+    const elEarnedCoins = document.getElementById("game_over_earned_coins");
+    const elTotalCoins = document.getElementById("game_over_total_coins");
+    const elScore = document.getElementById("game_over_score");
+    const elHighScore = document.getElementById("game_over_high_score");
+    const elNewRecord = document.getElementById("game_over_new_record_tag");
+
+    if (elScore) elScore.innerText = `${bonus_coins_collected * 20} pts (Bonus Rush)`;
+    if (elHighScore) elHighScore.innerText = `${(userGameData.highScores?.best || 0).toLocaleString()} pts`;
+    if (elNewRecord) elNewRecord.style.display = "none";
+
+    if (elCorrect) elCorrect.innerText = "N/A (Bonus Mode)";
+    if (elAnswerCoins) elAnswerCoins.innerHTML = `+${totalEarnedRound} <i class="fa fa-circle" style="color: #ffd700; font-size: 13px;"></i>`;
+    if (elWinCoins) elWinCoins.innerText = "Bonus Run Completed!";
+    if (elEarnedCoins) elEarnedCoins.innerHTML = `+${totalEarnedRound} <i class="fa fa-circle" style="color: #ffd700; font-size: 13px;"></i>`;
+    if (elTotalCoins) elTotalCoins.innerHTML = `${userGameData.coins} <i class="fa fa-circle" style="color: #ffd700; font-size: 13px;"></i>`;
+
+    const raceFinishHeader = document.querySelector(".race-finish");
+    if (raceFinishHeader) {
+      raceFinishHeader.innerHTML = `<i class="fa fa-circle" style="color: #ffd700; margin-right: 6px;"></i>Bonus Coin Rush Complete! <i class="fa fa-circle" style="color: #ffd700; margin-left: 6px;"></i><div style="font-size: 15px; color: #ffd700; margin-top: 5px;">Collected ${bonus_coins_collected} coins!</div>`;
+      raceFinishHeader.style.color = "gold";
+    }
+    return;
+  }
+
+  // Standard Race Run Completion
   const diffProfile = DIFFICULTY_PROFILES[selected_difficulty] || DIFFICULTY_PROFILES.beginner;
   let winBonusCoins = 0;
   if (playerWon) {
@@ -1690,6 +1974,20 @@ function end_game(playerWon) {
   }
   const totalEarnedRound = round_answer_coins + winBonusCoins;
 
+  // Calculate final score for this race
+  const finalRoundScore = calculate_current_score(playerWon);
+  const previousBest = userGameData.highScores?.best || 0;
+  const isNewHighScore = finalRoundScore > previousBest;
+
+  if (isNewHighScore) {
+    userGameData.highScores.best = finalRoundScore;
+  }
+  const levelKey = `${selected_difficulty}_${selected_level}`;
+  if (!userGameData.highScores.levels) userGameData.highScores.levels = {};
+  if (!userGameData.highScores.levels[levelKey] || finalRoundScore > userGameData.highScores.levels[levelKey]) {
+    userGameData.highScores.levels[levelKey] = finalRoundScore;
+  }
+
   // Update persistent user profile & statistics
   userGameData.coins += totalEarnedRound;
   userGameData.stats.racesPlayed += 1;
@@ -1703,37 +2001,165 @@ function end_game(playerWon) {
   save_user_data();
 
   // Populate Game Over Summary Panel
+  const elScore = document.getElementById("game_over_score");
+  const elHighScore = document.getElementById("game_over_high_score");
+  const elNewRecord = document.getElementById("game_over_new_record_tag");
   const elCorrect = document.getElementById("game_over_correct");
   const elAnswerCoins = document.getElementById("game_over_answer_coins");
   const elWinCoins = document.getElementById("game_over_win_coins");
   const elEarnedCoins = document.getElementById("game_over_earned_coins");
   const elTotalCoins = document.getElementById("game_over_total_coins");
 
+  if (elScore) elScore.innerText = `${finalRoundScore.toLocaleString()} pts`;
+  if (elHighScore) elHighScore.innerText = `${(userGameData.highScores?.best || 0).toLocaleString()} pts`;
+  if (elNewRecord) elNewRecord.style.display = isNewHighScore ? "block" : "none";
+
   if (elCorrect) elCorrect.innerText = round_correct;
-  if (elAnswerCoins) elAnswerCoins.innerText = `+${round_answer_coins} 🪙`;
-  if (elWinCoins) elWinCoins.innerText = playerWon ? `+${winBonusCoins} 🪙` : "0 🪙";
-  if (elEarnedCoins) elEarnedCoins.innerText = `+${totalEarnedRound} 🪙`;
-  if (elTotalCoins) elTotalCoins.innerText = `${userGameData.coins} 🪙`;
+  if (elAnswerCoins) elAnswerCoins.innerHTML = `+${round_answer_coins} <i class="fa fa-circle" style="color: #ffd700; font-size: 13px;"></i>`;
+  if (elWinCoins) elWinCoins.innerHTML = playerWon ? `+${winBonusCoins} <i class="fa fa-circle" style="color: #ffd700; font-size: 13px;"></i>` : `0 <i class="fa fa-circle" style="color: #ffd700; font-size: 13px;"></i>`;
+  if (elEarnedCoins) elEarnedCoins.innerHTML = `+${totalEarnedRound} <i class="fa fa-circle" style="color: #ffd700; font-size: 13px;"></i>`;
+  if (elTotalCoins) elTotalCoins.innerHTML = `${userGameData.coins} <i class="fa fa-circle" style="color: #ffd700; font-size: 13px;"></i>`;
 
   const raceFinishHeader = document.querySelector(".race-finish");
   if (raceFinishHeader) {
     if (playerWon) {
       const unlockNotice = selected_level < 5 ? `<div style="font-size: 16px; color: #58a6ff; margin-top: 6px;">🎉 Level ${selected_level + 1} Unlocked!</div>` : "";
-      raceFinishHeader.innerHTML = `🏆 Victory! You Won! 🏆${unlockNotice}`;
+      raceFinishHeader.innerHTML = `Victory! You Won! ${unlockNotice}`;
       raceFinishHeader.style.color = "gold";
     } else {
-      raceFinishHeader.innerText = "💥 Defeat! Opponent Won! 💥";
+      raceFinishHeader.innerText = "Defeat! Opponent Won!";
       raceFinishHeader.style.color = "red";
     }
   }
 }
 
-// Returns the player to the level selection screen to race again
+// --- High Score Bonus Coin Rush Driving Engine (No Math Questions!) ---
+function bonus_game_loop() {
+  if (!game_active || game_paused || !is_bonus_mode) return;
+
+  // 1. Move road lines downwards
+  const lines = document.querySelectorAll(".road_line");
+  lines.forEach(line => {
+    let topVal = parseFloat(line.style.top) || 0;
+    topVal += (speed / 20);
+    if (topVal >= 100) topVal = -10;
+    line.style.top = topVal + "%";
+  });
+
+  // 2. Increase distance
+  distance += speed * 0.015;
+  distance_hud.innerText = Math.floor(distance);
+  speed_hud.innerText = Math.floor(speed);
+
+  // 3. Spawn floating golden bonus coins randomly across lanes
+  const isAlreadyCompleted = active_bonus_level && (userGameData.completedBonusLevels || []).includes(active_bonus_level.id);
+  if (active_bonus_level && !isAlreadyCompleted && bonus_coins_collected < active_bonus_level.maxBonusCoins) {
+    // 25% chance per tick to spawn a coin cluster/item
+    if (Math.random() < 0.22) {
+      spawn_bonus_coin();
+    }
+  }
+
+  // 4. Move and handle collisions for track coins
+  handle_bonus_coins_movement();
+
+  // 5. Update HUD score display
+  const curScoreEl = document.getElementById("current_score_hud");
+  if (curScoreEl) curScoreEl.innerText = `${bonus_coins_collected} coins`;
+}
+
+function spawn_bonus_coin() {
+  if (!obstacle_container) return;
+  const coin = document.createElement("div");
+  coin.className = "track_coin_item";
+  coin.innerText = "🪙";
+
+  // Pick random lane (0, 1, or 2)
+  const laneIndex = Math.floor(Math.random() * lane_positions.length);
+  coin.style.left = lane_positions[laneIndex];
+  coin.style.top = "-8%";
+  obstacle_container.appendChild(coin);
+  active_track_coins.push(coin);
+}
+
+function handle_bonus_coins_movement() {
+  if (!obstacle_container || !player_car) return;
+  const playerRect = player_car.getBoundingClientRect();
+
+  // Shrink player hitbox slightly for fair collection
+  const hitbox = {
+    left: playerRect.left + 8,
+    right: playerRect.right - 8,
+    top: playerRect.top + 5,
+    bottom: playerRect.bottom - 5
+  };
+
+  const remaining = [];
+
+  active_track_coins.forEach(coin => {
+    if (!coin.parentNode) return;
+    let topVal = parseFloat(coin.style.top) || 0;
+    topVal += (speed / 16);
+
+    if (topVal >= 115) {
+      coin.remove();
+      return;
+    }
+
+    coin.style.top = topVal + "%";
+
+    // Collision detection with player car
+    const coinRect = coin.getBoundingClientRect();
+    const isColliding = !(
+      hitbox.right < coinRect.left ||
+      hitbox.left > coinRect.right ||
+      hitbox.bottom < coinRect.top ||
+      hitbox.top > coinRect.bottom
+    );
+
+    if (isColliding && !coin.dataset.collected) {
+      coin.dataset.collected = "true";
+      coin.remove();
+      bonus_coins_collected++;
+
+      const raceCoinsHud = document.getElementById("race_coins_hud");
+      if (raceCoinsHud) raceCoinsHud.innerText = bonus_coins_collected;
+
+      show_coin_feedback("+1 🪙");
+    } else {
+      remaining.push(coin);
+    }
+  });
+
+  active_track_coins = remaining;
+}
+
+function update_bonus_timer() {
+  if (game_paused || !is_bonus_mode) return;
+
+  bonus_time_left--;
+  const targetDistHud = document.getElementById("target_dist_hud");
+  if (targetDistHud) {
+    targetDistHud.innerText = `${bonus_time_left}s left`;
+  }
+
+  if (bonus_time_left <= 0) {
+    end_game(true);
+  }
+}
+
+// Returns the player to the level selection screen or store
 function restart_game() {
   stop_weather();
   game_over_view.style.display = "none";
-  screen_levels.style.display = "flex";
-  render_level_cards();
+  if (is_bonus_mode) {
+    is_bonus_mode = false;
+    open_store();
+    switch_store_tab("bonus");
+  } else {
+    screen_levels.style.display = "flex";
+    render_level_cards();
+  }
   
   // Ensure pause elements are visually reset
   document.getElementById("pause_btn").innerText = "⏸️ Pause";
@@ -1741,6 +2167,9 @@ function restart_game() {
 }
 
 function back_to_home() {
+  is_bonus_mode = false;
+  active_bonus_level = null;
+  active_track_coins = [];
   game_active = false;
   game_paused = false;
   clearInterval(game_loop_interval);
